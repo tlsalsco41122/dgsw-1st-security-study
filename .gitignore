@@ -36,5 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+# macOS
+.DS_Store
+
+# Ignore resource directories (do not upload resources folder to Git)
 src/main/resources/
 src/test/resources/
