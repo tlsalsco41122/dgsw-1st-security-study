@@ -43,7 +43,7 @@ public class TokenProvider {
      * 7. 스프링 종료
      */
 
-    public String createToken(User user, Duration expireAt) {
+    public String generateToken(User user, Duration expireAt) {
         Date now = new Date();
         return makeToken(
                 new Date(now.getTime() + expireAt.toMillis()),
