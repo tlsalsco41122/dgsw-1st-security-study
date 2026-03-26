@@ -2,6 +2,7 @@ package com.kr.hs.dgsw_security.config.jwt;
 
 import com.kr.hs.dgsw_security.domain.User;
 import com.kr.hs.dgsw_security.repository.UserRepository;
+import com.kr.hs.dgsw_security.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +11,9 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -121,5 +124,14 @@ public class TokenProvider {
     public Authentication getAuthentication(String token) {
         String email = getSubject(token); // 사용자 이메일
 
+        // 토큰에서 추출한 이메일이 우리 디비에서 아직도 사용 가능한 이메일인지 재확인
+        User dbUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("user not found" + email));
+
+        CustomUserDetails customUserDetails = new CustomUserDetails(dbUser);
+
+        return new UsernamePasswordAuthenticationToken(
+                customUserDetails,
+                null, customUserDetails.getAuthorities());
     }
 }
