@@ -1,5 +1,7 @@
 package com.kr.hs.dgsw_security.security;
 
+import com.kr.hs.dgsw_security.config.TokenAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,13 +12,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * HttpSecurity : 보안설정 만드는 놈
  * SecurityFilterChain : 만들어진 보안
  */
 @Configuration // 이 클래스는 설정 클래스
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -30,7 +36,8 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()
-                );
+                )
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

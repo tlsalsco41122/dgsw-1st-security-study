@@ -22,4 +22,10 @@ public class UserServiceImpl implements UserService {
                 .role(UserRole.USER)
                 .build());
     }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(("Unexpected Id")));
+    }
 }
